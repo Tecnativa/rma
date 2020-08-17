@@ -628,9 +628,10 @@ class Rma(models.Model):
         """Invoked when 'Split' button in rma form view is clicked."""
         self.ensure_one()
         self._ensure_can_be_split()
-        action = self.env.ref("rma.rma_split_wizard_action").read()[0]
+        action = self.env.ref("rma.rma_split_wizard_action").with_context(
+            active_id=self.id, active_ids=self.ids).read()[0]
         action['context'] = dict(self.env.context)
-        action['context'].update(active_ids=self.ids)
+        action['context'].update(active_id=self.id, active_ids=self.ids)
         return action
 
     def action_cancel(self):
