@@ -111,6 +111,7 @@ class SaleOrderLine(models.Model):
                     'quantity': qty,
                     'uom': move.product_uom,
                     'picking': move.picking_id,
+                    'sale_line_id': self,
                 })
         else:
             data.append({
@@ -118,5 +119,6 @@ class SaleOrderLine(models.Model):
                 'quantity': self.qty_delivered,
                 'uom': self.product_uom,
                 'picking': False,
+                'sale_line_id': self,
             })
         return data
