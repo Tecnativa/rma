@@ -1,9 +1,10 @@
 # Copyright 2020 Tecnativa - Ernesto Tejeda
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "Return Merchandise Authorization Management",
     "summary": "Return Merchandise Authorization (RMA)",
-    "version": "15.0.1.2.0",
+    "version": "15.0.2.0.0",
     "development_status": "Production/Stable",
     "category": "RMA",
     "website": "https://github.com/OCA/rma",
