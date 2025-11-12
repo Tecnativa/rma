@@ -1,15 +1,17 @@
 # Copyright 2024 Antoni Marroig(APSL-Nagarro)<amarroig@apsl.net>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import Form, TransactionCase
+from odoo.tests import Form
+
+from odoo.addons.base.tests.common import BaseCommon
 
 
-class RMARepairOrderTest(TransactionCase):
+class RMARepairOrderTest(BaseCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.warehouse_company = cls.env["stock.warehouse"].search(
-            [("company_id", "=", cls.env.user.company_id.id)], limit=1
+            [("company_id", "=", cls.env.company.id)], limit=1
         )
         cls.rma_loc = cls.warehouse_company.rma_loc_id
         cls.res_partner = cls.env["res.partner"].create({"name": "Test"})
@@ -102,9 +104,9 @@ class RMARepairOrderTest(TransactionCase):
         self.assertEqual(
             self.repair_order.action_view_repair_rma(),
             {
-                "name": "RMAs - " + self.repair_order.name,
+                "name": f"RMAs - {self.repair_order.name}",
                 "type": "ir.actions.act_window",
-                "view_mode": "tree,form",
+                "view_mode": "list,form",
                 "res_model": "rma",
                 "domain": [("id", "in", self.repair_order.rma_ids.ids)],
             },
