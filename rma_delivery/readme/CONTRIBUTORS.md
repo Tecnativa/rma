@@ -1,0 +1,3 @@
+- [Tecnativa](https://www.tecnativa.com):
+  - David Vidal
+- Souheil Bejaoui - ACSONE SA/NV \<<souheil.bejaoui@acsone.eu>\>
