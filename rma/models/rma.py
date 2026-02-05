@@ -717,6 +717,7 @@ class Rma(models.Model):
             "move_type": "direct",
             "partner_id": self and self.partner_shipping_id.id or False,
             "name": self and ", ".join(self.mapped("name")) or False,
+            "rma_id": self.id,
         }
 
     def _prepare_common_procurement_vals(
@@ -1228,10 +1229,11 @@ class Rma(models.Model):
             rmas = self.browse().concat(*list(rmas))
             if not rmas:
                 continue
-            proc_group = self.env["procurement.group"].create(
-                rmas._prepare_procurement_group_vals()
-            )
-            rmas.write({"procurement_group_id": proc_group.id})
+            for rma in rmas:
+                proc_group = self.env["procurement.group"].create(
+                    rma._prepare_procurement_group_vals()
+                )
+                rma.write({"procurement_group_id": proc_group.id})
 
     def _assign_delivery_procurement_group(self):
         """Groups the given rmas by the returned key from _get_delivery_group_key
@@ -1247,10 +1249,11 @@ class Rma(models.Model):
             rmas = self.browse().concat(*list(rmas))
             if not rmas:
                 continue
-            proc_group = self.env["procurement.group"].create(
-                rmas._prepare_procurement_group_vals()
-            )
-            rmas.write({"procurement_group_id": proc_group.id})
+            for rma in rmas:
+                proc_group = self.env["procurement.group"].create(
+                    rma._prepare_procurement_group_vals()
+                )
+                rma.write({"procurement_group_id": proc_group.id})
 
     def _prepare_delivery_procurement_vals(self, scheduled_date=None):
         """This method is used only for Delivery (not replace). It is important to set

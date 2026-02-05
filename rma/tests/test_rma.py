@@ -659,33 +659,33 @@ class TestRmaCase(TestRma):
         )
         delivery_wizard.action_deliver()
         # Two pickings were created
-        pick_1 = (rma_1 | rma_2 | rma_3).mapped("delivery_move_ids.picking_id")
+        picks_1 = (rma_1 | rma_2 | rma_3).mapped("delivery_move_ids.picking_id")
         pick_2 = rma_4.delivery_move_ids.picking_id
-        self.assertEqual(pick_1.picking_type_id, self.warehouse.rma_out_type_id)
-        self.assertEqual(pick_1.location_id, self.warehouse.rma_loc_id)
+        self.assertEqual(picks_1.picking_type_id, self.warehouse.rma_out_type_id)
+        self.assertEqual(picks_1.location_id, self.warehouse.rma_loc_id)
         self.assertEqual(pick_2.picking_type_id, self.warehouse.rma_out_type_id)
         self.assertEqual(pick_2.location_id, self.warehouse.rma_loc_id)
-        self.assertEqual(len(pick_1), 1)
+        self.assertEqual(len(picks_1), 3)
         self.assertEqual(len(pick_2), 1)
-        self.assertNotEqual(pick_1, pick_2)
-        self.assertEqual((pick_1 | pick_2).mapped("state"), ["assigned"] * 2)
+        self.assertNotEqual(picks_1, pick_2)
+        self.assertEqual((picks_1 | pick_2).mapped("state"), ["assigned"] * 4)
         # One picking per partner
-        self.assertNotEqual(pick_1.partner_id, pick_2.partner_id)
+        self.assertNotEqual(picks_1.partner_id, pick_2.partner_id)
         self.assertEqual(
-            pick_1.partner_id,
+            picks_1.partner_id,
             (rma_1 | rma_2 | rma_3).mapped("partner_shipping_id"),
         )
         self.assertEqual(pick_2.partner_id, rma_4.partner_id)
         # Each RMA of (rma_1, rma_2 and rma_3) is linked to a different
         # line of picking_1
-        self.assertEqual(len(pick_1.move_ids), 3)
+        self.assertEqual(len(picks_1.move_ids), 3)
         self.assertEqual(
-            pick_1.move_ids.rma_id,
+            picks_1.move_ids.rma_id,
             (rma_1 | rma_2 | rma_3),
         )
         self.assertEqual(
             (rma_1 | rma_2 | rma_3).mapped("delivery_move_ids"),
-            pick_1.move_ids,
+            picks_1.move_ids,
         )
         # rma_4 is linked with the unique move of pick_2
         self.assertEqual(len(pick_2.move_ids), 1)
@@ -697,7 +697,7 @@ class TestRmaCase(TestRma):
             self.assertEqual(rma.product_uom_qty, rma.delivery_move_ids.product_uom_qty)
             self.assertEqual(rma.product_uom, rma.delivery_move_ids.product_uom)
             rma.delivery_move_ids.quantity = rma.product_uom_qty
-        pick_1.button_validate()
+        picks_1.button_validate()
         pick_2.button_validate()
         self.assertEqual(all_rmas.mapped("state"), ["returned"] * 4)
 
@@ -759,15 +759,15 @@ class TestRmaCase(TestRma):
         rmas = origin_moves.rma_ids
         self.assertEqual(rmas.mapped("state"), ["confirmed"] * 2)
         # Each reception move is linked one of the generated RMAs
-        reception = self.env["stock.picking"].browse(picking_action["res_id"])
-        reception_moves = reception.move_ids
+        receptions = self.env["stock.picking"].search(picking_action["domain"])
+        reception_moves = receptions.move_ids
         self.assertTrue(reception_moves[0].rma_receiver_ids)
         self.assertTrue(reception_moves[1].rma_receiver_ids)
         self.assertEqual(reception_moves.rma_receiver_ids, rmas)
         # Validate the reception picking to set rmas to 'received' state
         reception_moves[0].quantity = reception_moves[0].product_uom_qty
         reception_moves[1].quantity = reception_moves[1].product_uom_qty
-        reception.button_validate()
+        receptions.button_validate()
         self.assertEqual(rmas.mapped("state"), ["received"] * 2)
 
     def test_split(self):
@@ -1004,8 +1004,8 @@ class TestRmaCase(TestRma):
         self.assertTrue(rma3.procurement_group_id)
         self.assertEqual(rma1.procurement_group_id, rma1.procurement_group_id)
         self.assertNotEqual(rma1.procurement_group_id, rma3.procurement_group_id)
-        self.assertEqual(len((rma1 | rma2).reception_move_id.picking_id), 1)
-        self.assertEqual(len((rma1 | rma2 | rma3).reception_move_id.picking_id), 2)
+        self.assertEqual(len((rma1 | rma2).reception_move_id.picking_id), 2)
+        self.assertEqual(len((rma1 | rma2 | rma3).reception_move_id.picking_id), 3)
 
     def test_copy_operation(self):
         operation = self.env.ref("rma.rma_operation_refund")

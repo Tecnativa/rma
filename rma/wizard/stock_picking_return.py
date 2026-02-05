@@ -108,7 +108,7 @@ class ReturnPicking(models.TransientModel):
         """Override create_returns method for creating one or more
         'confirmed' RMAs after return a delivery picking in case
         'Create RMAs' checkbox is checked in this wizard.
-        New RMAs will be linked to the delivery picking as the origin
+        New RMAs will be linked to the delivery pickings as the origin
         delivery and also RMAs will be linked to the returned picking
         as the 'Receipt'.
         """
@@ -123,8 +123,8 @@ class ReturnPicking(models.TransientModel):
             vals_list = self._prepare_rma_vals_list()
             rmas = self.env["rma"].create(vals_list)
             rmas.action_confirm()
-            picking = rmas.reception_move_id.picking_id
-            picking = picking and picking[0] or picking
+            pickings = rmas.reception_move_id.picking_id
+            picking = pickings and pickings[0]
             ctx = dict(self.env.context)
             ctx.update(
                 {
@@ -138,12 +138,16 @@ class ReturnPicking(models.TransientModel):
                     "search_default_available": False,
                 }
             )
-            return {
+            data = {
                 "name": self.env._("Returned Picking"),
                 "view_mode": "form,list,calendar",
                 "res_model": "stock.picking",
-                "res_id": picking.id,
                 "type": "ir.actions.act_window",
                 "context": ctx,
             }
+            if len(pickings) == 1:
+                data["res_id"] = picking.id
+            else:
+                data["domain"] = [("id", "in", pickings.ids)]
+            return data
         return super().action_create_returns()
