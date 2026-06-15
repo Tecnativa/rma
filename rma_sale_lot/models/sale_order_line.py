@@ -34,12 +34,15 @@ class SaleOrderLine(models.Model):
             return {}
         if not self.product_id.tracking or self.product_id.tracking == "none":
             return super().prepare_sale_rma_data()
-        moves = self.get_delivery_move()
+        outgoing_moves, _incoming_moves = self._get_outgoing_incoming_moves()
+        outgoing_moves = outgoing_moves.filtered(lambda x: x.state == "done")
         data = []
-        qty_done_by_product_lot = self._get_qty_done_by_product_lot(moves)
+        qty_done_by_product_lot = self._get_qty_done_by_product_lot(outgoing_moves)
         for (product_id, lot_id), qty_done in qty_done_by_product_lot.items():
             data.append(
-                self._prepare_sale_rma_data_line(moves, product_id, lot_id, qty_done)
+                self._prepare_sale_rma_data_line(
+                    outgoing_moves, product_id, lot_id, qty_done
+                )
             )
         return data
 
