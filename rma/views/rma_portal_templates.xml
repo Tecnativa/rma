@@ -286,6 +286,14 @@
                                 <span t-field="rma.origin" />
                             </div>
                         </div>
+                        <div t-if="rma.operation_id" class="row mb-2 mb-sm-1">
+                            <div class="col-12 col-sm-4">
+                                <strong>Requested operation</strong>
+                            </div>
+                            <div class="col-12 col-sm-8">
+                                <span t-field="rma.operation_id" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
