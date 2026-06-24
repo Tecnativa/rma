@@ -29,6 +29,7 @@
     >
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/rma/static/src/img/rma_icon.svg'" />
                 <t t-set="title">RMA Orders</t>
                 <t t-set="text" t-value="'Manage your RMA Orders'" />
                 <t t-set="url" t-value="'/my/rmas'" />
